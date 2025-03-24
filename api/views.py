@@ -8,8 +8,6 @@ from rest_framework import status
 from rest_framework.parsers import MultiPartParser, FormParser
 from openai import OpenAI
 
-# Create your views here.
-
 class ProcessImageView(APIView):
     """
     API endpoint that accepts an image and sends it to OpenAI for processing.
@@ -18,14 +16,15 @@ class ProcessImageView(APIView):
     
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        # Initialize OpenAI client
+
         api_key = settings.OPENAI_API_KEY
+
         if not api_key:
             raise ValueError("OpenAI API key is not set. Please check your environment variables.")
+
         self.client = OpenAI(api_key=api_key)
         
-        # Updated prompt template with specific JSON structure
-        self.prompt_template = """Analyze this restaurant menu image and return a JSON with the following structure:  
+        self.prompt_template = """Analyze this restaurant menu image and return a JSON with the following structure:
         {  
         "categories": [  
             {  
@@ -54,7 +53,7 @@ class ProcessImageView(APIView):
     
     def post(self, request, *args, **kwargs):
         """Handle POST requests to process images."""
-        # Check if image file is in the request
+
         if 'image' not in request.FILES:
             return Response(
                 {"error": "No image file provided. Please upload an image."},
@@ -63,13 +62,9 @@ class ProcessImageView(APIView):
         
         try:
             image_file = request.FILES['image']
-            
-            # Encode the image as base64 to send to OpenAI
             image_data = base64.b64encode(image_file.read()).decode('utf-8')
-            
-            # Make request to OpenAI Vision API
-            response = self.client.chat.completions.create(
-                model="gpt-4o-mini",  # Use the latest vision model
+            response = self.client.chat.completions.create,
+                model="gpt-4o-mini",
                 messages=[
                     {
                         "role": "system",
@@ -89,10 +84,9 @@ class ProcessImageView(APIView):
                     }
                 ],
                 max_tokens=4000,
-                response_format={"type": "json_object"}  # Enforce JSON response
+                response_format={"type": "json_object"}
             )
             
-            # Process and return the response
             ai_response = {
                 "result": response.choices[0].message.content,
                 "usage": {
